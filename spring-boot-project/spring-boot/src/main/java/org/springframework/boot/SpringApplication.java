@@ -266,8 +266,11 @@ public class SpringApplication {
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+		// 保存启动类
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		// 推断web类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		// 初始化initializer、listener（遍历所有jar包下的spring.factories文件，根据传进来的接口读取实现类全类名并实例化）
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
@@ -295,18 +298,26 @@ public class SpringApplication {
 	 */
 	public ConfigurableApplicationContext run(String... args) {
 		long startTime = System.nanoTime();
+		// 创建引导上下文
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
+		// 配置java.awt.headless
 		configureHeadlessProperty();
+		// SpringApplicationRunListener (org.springframework.boot.context.event.EventPublishingRunListener) to publish SpringApplicationEvents.
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			// 根据webApplicationType准备Environment
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			Banner printedBanner = printBanner(environment);
+			// 根据webApplicationType创建应用上下文ApplicationContext
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
+			// 准备应用上下文ApplicationContext
+			// 这里会将启动类包装成BeanDefinition，并注册到beanDefinitionMap中
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+			// 刷新应用上下文
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);

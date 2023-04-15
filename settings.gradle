@@ -86,3 +86,12 @@ file("${rootDir}/spring-boot-project/spring-boot-starters").eachDirMatch(~/sprin
 file("${rootDir}/spring-boot-tests/spring-boot-smoke-tests").eachDirMatch(~/spring-boot-smoke-test.*/) {
 	include "spring-boot-tests:spring-boot-smoke-tests:${it.name}"
 }
+
+//include "spring-web"
+//project(":spring-web").projectDir = new File("E:/code/spring-framework/spring-web")
+
+//include "spring-webmvc"
+//project(":spring-webmvc").projectDir = file("E:/code/spring-framework/spring-webmvc")
+
+include 'samples-test-spring-boot-web'
+
