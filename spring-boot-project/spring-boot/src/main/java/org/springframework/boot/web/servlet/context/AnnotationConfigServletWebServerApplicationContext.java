@@ -70,28 +70,6 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 	 * {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigServletWebServerApplicationContext() {
-		/**
-		 * registerBeanDefinition
-		 * 
-		 * org.springframework.context.annotation.internalConfigurationAnnotationProcessor
-		 * -> org.springframework.context.annotation.ConfigurationClassPostProcessor
-		 * 
-		 * org.springframework.context.annotation.internalAutowiredAnnotationProcessor
-		 * -> org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
-		 * 
-		 * org.springframework.context.annotation.internalCommonAnnotationProcessor
-		 * -> org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
-		 * 
-		 * org.springframework.context.annotation.internalJsr250AnnotationProcessor
-		 * -> org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor
-		 *    for the javax variant of PostConstruct/PreDestroy.
-		 * 
-		 * org.springframework.context.event.internalEventListenerProcessor
-		 * -> org.springframework.context.event.EventListenerMethodProcessor
-		 * 
-		 * org.springframework.context.event.internalEventListenerFactory
-		 * -> org.springframework.context.event.DefaultEventListenerFactory
-		 */
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
