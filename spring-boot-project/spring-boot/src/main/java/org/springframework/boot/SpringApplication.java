@@ -270,10 +270,12 @@ public class SpringApplication {
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
 		// 推断web类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
-		// 初始化initializer、listener（遍历所有jar包下的spring.factories文件，根据传进来的接口读取实现类全类名并实例化）
+		// 扫描所有META-INF/spring.factories读取key为BootstrapRegistryInitializer的扩展点，通过反射创建实例，BootstrapRegistryInitializer用来初始化BootstrapRegistry
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
+		// 扫描所有META-INF/spring.factories读取key为ApplicationContextInitializer的扩展点，通过反射创建实例，ApplicationContextInitializer用来初始化ApplicationContext
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		// 扫描所有META-INF/spring.factories读取key为ApplicationListener的扩展点，通过反射创建实例
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
@@ -303,7 +305,8 @@ public class SpringApplication {
 		ConfigurableApplicationContext context = null;
 		// 配置java.awt.headless
 		configureHeadlessProperty();
-		// SpringApplicationRunListener (org.springframework.boot.context.event.EventPublishingRunListener) to publish SpringApplicationEvents.
+		// 扫描所有META-INF/spring.factories读取key为SpringApplicationRunListener的扩展点
+		// （org.springframework.boot.context.event.EventPublishingRunListener），通过反射创建实例，用于在SpringBoot启动过程各个阶段发布SpringApplicationEvent事件
 		SpringApplicationRunListeners listeners = getRunListeners(args);
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
@@ -325,6 +328,7 @@ public class SpringApplication {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), timeTakenToStartup);
 			}
 			listeners.started(context, timeTakenToStartup);
+			// 调用ApplicationRunner和CommandLineRunner的run方法
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -362,6 +366,10 @@ public class SpringApplication {
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
+		// 发布事件ApplicationEnvironmentPreparedEvent
+		// 被EnvironmentPostProcessorApplicationListener监听
+		// 交给ConfigDataEnvironmentPostProcessor处理
+		// 将application.yml或application.properties文件内容绑定到AbstractEnvironment#propertySources中
 		listeners.environmentPrepared(bootstrapContext, environment);
 		DefaultPropertiesPropertySource.moveToEnd(environment);
 		Assert.state(!environment.containsProperty("spring.main.environment-prefix"),

@@ -3,6 +3,8 @@ plugins {
     id "org.springframework.boot.conventions"
 }
 
+description "amy-test"
+
 dependencies {
     implementation(project(":spring-boot-project:spring-boot-starters:spring-boot-starter-web"))
     testImplementation(project(":spring-boot-project:spring-boot-starters:spring-boot-starter-test"))

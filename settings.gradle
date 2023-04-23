@@ -22,7 +22,7 @@ pluginManagement {
 
 plugins {
 	id "com.gradle.enterprise" version "3.12.5"
-	id "io.spring.ge.conventions" version "0.0.13"
+	// id "io.spring.ge.conventions" version "0.0.13" // To solve A build scan was not published as you have not authenticated with server 'ge.spring.io'.
 }
 
 rootProject.name="spring-boot-build"
